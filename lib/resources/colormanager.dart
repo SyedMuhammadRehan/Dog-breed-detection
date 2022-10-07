@@ -4,6 +4,7 @@ class ColorManager {
   static Color primary = HexColor.fromHex('#ea725a');
   static Color white = HexColor.fromHex('#FFFFFF');
   static Color error = HexColor.fromHex('#e61f34');
+  static Color black = Colors.black;
 }
 
 extension HexColor on Color {

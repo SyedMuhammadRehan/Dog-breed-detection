@@ -1,8 +1,13 @@
+import 'package:camera/camera.dart';
 import 'package:dog_breed_detection/resources/routesmanager.dart';
 import 'package:dog_breed_detection/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+late List<CameraDescription> cameras;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
