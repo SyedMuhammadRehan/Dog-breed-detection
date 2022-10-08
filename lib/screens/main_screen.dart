@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:dog_breed_detection/resources/assets.dart';
 import 'package:dog_breed_detection/resources/colormanager.dart';
 import 'package:dog_breed_detection/resources/fontsmanager.dart';
 import 'package:dog_breed_detection/resources/sizeconfig.dart';
@@ -19,6 +20,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   File? imageFile;
+  bool imgfile = false;
   CameraImage? imgcamera;
   bool isWorking = false;
   String result = '';
@@ -150,7 +152,7 @@ class _MainScreenState extends State<MainScreen> {
                       )
                     : Container(), //Container
                 Positioned(
-                  bottom: 40,
+                  bottom: 50,
                   left: 0,
                   right: 0,
                   child: Center(
@@ -163,24 +165,147 @@ class _MainScreenState extends State<MainScreen> {
                           Icons.image,
                           color: ColorManager.primary,
                         ),
-                        Container(
-                          height: getProportionateScreenHeight(100),
-                          width: getProportionateScreenWidth(100),
-                          decoration: BoxDecoration(
+                        InkWell(
+                          onTap: (() async {
+                            if (controller != null) {
+                              if (controller!.value.isInitialized) {
+                                var img = await controller!.takePicture();
+                                setState(() {
+                                  imageFile = File(img.path);
+                                  imgfile = true;
+                                });
+
+                                await showModalBottomSheet(
+                                    elevation: 50,
+                                    isDismissible: true,
+                                    backgroundColor: Colors.transparent,
+                                    enableDrag: true,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(50)),
+                                    context: context,
+                                    builder: (context) {
+                                      return Container(
+                                        height: double.infinity,
+                                        width: double.infinity,
+                                        decoration: const BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20.0),
+                                                topRight:
+                                                    Radius.circular(20.0)),
+                                            color: Colors.transparent,
+                                            image: DecorationImage(
+                                                fit: BoxFit.contain,
+                                                image: AssetImage(
+                                                  ImageAssets.bottom,
+                                                ))),
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                              color: ColorManager.white
+                                                  .withOpacity(0.2),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(20.0),
+                                                      topRight: Radius.circular(
+                                                          20.0)),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  height:
+                                                      getProportionateScreenHeight(
+                                                          10),
+                                                ),
+                                                Container(
+                                                  height:
+                                                      getProportionateScreenHeight(
+                                                          250),
+                                                  width:
+                                                      getProportionateScreenWidth(
+                                                          250),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: ColorManager
+                                                            .primary,
+                                                        width: 5),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: CircleAvatar(
+                                                      foregroundImage:
+                                                          Image.file(imageFile!)
+                                                              .image,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height:
+                                                      getProportionateScreenHeight(
+                                                          10),
+                                                ),
+                                                Card(
+                                                  shadowColor:
+                                                      ColorManager.primary,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                  ),
+                                                  elevation: 20,
+                                                  child: ListTile(
+                                                    dense: true,
+                                                    focusColor:
+                                                        ColorManager.primary,
+                                                    leading: Text(
+                                                      "DOG BREED",
+                                                      style: TextStyle(
+                                                          color: ColorManager
+                                                              .primary,
+                                                          fontSize:
+                                                              FontSize.s18),
+                                                    ),
+                                                    title: const Text("TEXT"),
+                                                  ),
+                                                )
+                                              ],
+                                            )),
+                                      );
+                                    });
+                              }
+                            }
+                            setState(() {
+                              imgfile = false;
+                            });
+                          }),
+                          child: Container(
+                            height: getProportionateScreenHeight(100),
+                            width: getProportionateScreenWidth(100),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
                               border: Border.all(color: ColorManager.primary),
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: getProportionateScreenHeight(60),
-                              width: getProportionateScreenWidth(60),
-                              decoration: BoxDecoration(
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: getProportionateScreenHeight(60),
+                                width: getProportionateScreenWidth(60),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
                                   color: ColorManager.primary,
-                                  borderRadius: BorderRadius.circular(100)),
-                              child: Icon(
-                                Icons.search,
-                                size: getProportionateScreenHeight(40),
-                                color: ColorManager.white,
+                                ),
+                                child: Icon(
+                                  Icons.search,
+                                  size: getProportionateScreenHeight(40),
+                                  color: ColorManager.white,
+                                ),
                               ),
                             ),
                           ),
