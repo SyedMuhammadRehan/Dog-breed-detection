@@ -8,6 +8,7 @@ import 'package:dog_breed_detection/resources/sizeconfig.dart';
 import 'package:dog_breed_detection/resources/stringmanager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../main.dart';
 
@@ -116,6 +117,15 @@ class _MainScreenState extends State<MainScreen> {
     super.dispose();
   }
 
+  var imagpicker = ImagePicker();
+  Future getimagefromgallery() async {
+    var img = await imagpicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      imageFile = File(img!.path);
+    });
+    imageFile != null ? showbottomsheet() : Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -160,10 +170,15 @@ class _MainScreenState extends State<MainScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          size: getProportionateScreenHeight(30),
-                          Icons.image,
-                          color: ColorManager.primary,
+                        InkWell(
+                          onTap: (() {
+                            getimagefromgallery();
+                          }),
+                          child: Icon(
+                            size: getProportionateScreenHeight(30),
+                            Icons.image,
+                            color: ColorManager.primary,
+                          ),
                         ),
                         InkWell(
                           onTap: (() async {
@@ -174,111 +189,6 @@ class _MainScreenState extends State<MainScreen> {
                                   imageFile = File(img.path);
                                   imgfile = true;
                                 });
-
-                                await showModalBottomSheet(
-                                    elevation: 50,
-                                    isDismissible: true,
-                                    backgroundColor: Colors.transparent,
-                                    enableDrag: true,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(50)),
-                                    context: context,
-                                    builder: (context) {
-                                      return Container(
-                                        height: double.infinity,
-                                        width: double.infinity,
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20.0),
-                                                topRight:
-                                                    Radius.circular(20.0)),
-                                            color: Colors.transparent,
-                                            image: DecorationImage(
-                                                fit: BoxFit.contain,
-                                                image: AssetImage(
-                                                  ImageAssets.bottom,
-                                                ))),
-                                        child: Container(
-                                            decoration: BoxDecoration(
-                                              color: ColorManager.white
-                                                  .withOpacity(0.2),
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(20.0),
-                                                      topRight: Radius.circular(
-                                                          20.0)),
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  height:
-                                                      getProportionateScreenHeight(
-                                                          10),
-                                                ),
-                                                Container(
-                                                  height:
-                                                      getProportionateScreenHeight(
-                                                          250),
-                                                  width:
-                                                      getProportionateScreenWidth(
-                                                          250),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: ColorManager
-                                                            .primary,
-                                                        width: 5),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    child: CircleAvatar(
-                                                      foregroundImage:
-                                                          Image.file(imageFile!)
-                                                              .image,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height:
-                                                      getProportionateScreenHeight(
-                                                          10),
-                                                ),
-                                                Card(
-                                                  shadowColor:
-                                                      ColorManager.primary,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                  ),
-                                                  elevation: 20,
-                                                  child: ListTile(
-                                                    dense: true,
-                                                    focusColor:
-                                                        ColorManager.primary,
-                                                    leading: Text(
-                                                      "DOG BREED",
-                                                      style: TextStyle(
-                                                          color: ColorManager
-                                                              .primary,
-                                                          fontSize:
-                                                              FontSize.s18),
-                                                    ),
-                                                    title: const Text("TEXT"),
-                                                  ),
-                                                )
-                                              ],
-                                            )),
-                                      );
-                                    });
                               }
                             }
                             setState(() {
@@ -322,5 +232,83 @@ class _MainScreenState extends State<MainScreen> {
         ],
       )),
     );
+  }
+
+  Future showbottomsheet() {
+    return showModalBottomSheet(
+        elevation: 50,
+        isDismissible: true,
+        backgroundColor: Colors.transparent,
+        enableDrag: true,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        context: context,
+        builder: (context) {
+          return Container(
+            height: double.infinity,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0)),
+                color: Colors.transparent,
+                image: DecorationImage(
+                    fit: BoxFit.contain,
+                    image: AssetImage(
+                      ImageAssets.bottom,
+                    ))),
+            child: Container(
+                decoration: BoxDecoration(
+                  color: ColorManager.white.withOpacity(0.2),
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: getProportionateScreenHeight(10),
+                    ),
+                    Container(
+                      height: getProportionateScreenHeight(250),
+                      width: getProportionateScreenWidth(250),
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: ColorManager.primary, width: 5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: CircleAvatar(
+                          foregroundImage: Image.file(imageFile!).image,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: getProportionateScreenHeight(10),
+                    ),
+                    Card(
+                      shadowColor: ColorManager.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      elevation: 20,
+                      child: ListTile(
+                        dense: true,
+                        focusColor: ColorManager.primary,
+                        leading: Text(
+                          "DOG BREED",
+                          style: TextStyle(
+                              color: ColorManager.primary,
+                              fontSize: FontSize.s18),
+                        ),
+                        title: const Text("TEXT"),
+                      ),
+                    )
+                  ],
+                )),
+          );
+        });
   }
 }
