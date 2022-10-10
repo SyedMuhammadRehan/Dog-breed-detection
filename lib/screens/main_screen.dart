@@ -9,6 +9,7 @@ import 'package:dog_breed_detection/resources/stringmanager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tflite/tflite.dart';
 
 import '../main.dart';
 
@@ -102,12 +103,43 @@ class _MainScreenState extends State<MainScreen> {
     // Update the Boolean
   }
 
+  loaddatamodel() async {
+    Tflite.close();
+    var tf = await Tflite.loadModel(
+      model: "assets/tflite_model/bread.tflite",
+      labels: "assets/tflite_model/label.txt",
+      numThreads: 1,
+    );
+    print("success $tf ");
+  }
+
+  var output;
+  Future<List?> classifyImage(File image) async {
+    output = await Tflite.runModelOnImage(
+      path: image.path, // required
+      imageMean: 0.0,
+      imageStd: 300.0,
+      numResults: 2,
+      threshold: 0.2,
+      asynch: true,
+    );
+    print("RESULT $result");
+    print("detected output is ${output![0]['label']}");
+
+    setState(() {
+      result = output[0]['label'];
+      print("RESULT $result");
+    });
+    await showbottomsheet();
+    return output;
+  }
+
   @override
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
     onNewCameraSelected(cameras[0]);
-
+    loaddatamodel();
     super.initState();
   }
 
@@ -123,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       imageFile = File(img!.path);
     });
-    imageFile != null ? showbottomsheet() : Navigator.pop(context);
+    classifyImage(imageFile!);
   }
 
   @override
@@ -182,6 +214,7 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         InkWell(
                           onTap: (() async {
+                            print("camera");
                             if (controller != null) {
                               if (controller!.value.isInitialized) {
                                 var img = await controller!.takePicture();
@@ -189,6 +222,135 @@ class _MainScreenState extends State<MainScreen> {
                                   imageFile = File(img.path);
                                   imgfile = true;
                                 });
+                                classifyImage(imageFile!);
+                                imageFile != null
+                                    ? showModalBottomSheet(
+                                        elevation: 50,
+                                        isDismissible: true,
+                                        backgroundColor: Colors.transparent,
+                                        enableDrag: true,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        context: context,
+                                        builder: (context) {
+                                          return Container(
+                                            height: double.infinity,
+                                            width: double.infinity,
+                                            decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(20.0),
+                                                    topRight:
+                                                        Radius.circular(20.0)),
+                                                color: Colors.transparent,
+                                                image: DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: AssetImage(
+                                                      ImageAssets.bottom,
+                                                    ))),
+                                            child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: ColorManager.white
+                                                      .withOpacity(0.3),
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  20.0)),
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(
+                                                      height:
+                                                          getProportionateScreenHeight(
+                                                              10),
+                                                    ),
+                                                    Container(
+                                                      height:
+                                                          getProportionateScreenHeight(
+                                                              250),
+                                                      width:
+                                                          getProportionateScreenWidth(
+                                                              250),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: ColorManager
+                                                                .primary,
+                                                            width: 10),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10.0),
+                                                        child: FittedBox(
+                                                          fit: BoxFit.contain,
+                                                          child: CircleAvatar(
+                                                            foregroundImage:
+                                                                Image.file(
+                                                                        imageFile!)
+                                                                    .image,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height:
+                                                          getProportionateScreenHeight(
+                                                              10),
+                                                    ),
+                                                    Card(
+                                                      color:
+                                                          ColorManager.primary,
+                                                      shadowColor:
+                                                          ColorManager.black,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                      ),
+                                                      elevation: 20,
+                                                      child: ListTile(
+                                                        dense: true,
+                                                        focusColor:
+                                                            ColorManager.white,
+                                                        leading: Text(
+                                                          "DOG BREED:",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  ColorManager
+                                                                      .white,
+                                                              fontSize:
+                                                                  FontSize.s18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        title: Text(
+                                                          result,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  ColorManager
+                                                                      .white,
+                                                              fontSize:
+                                                                  FontSize.s18),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )),
+                                          );
+                                        })
+                                    : Navigator.pop(context);
                               }
                             }
                             setState(() {
@@ -252,13 +414,13 @@ class _MainScreenState extends State<MainScreen> {
                     topRight: Radius.circular(20.0)),
                 color: Colors.transparent,
                 image: DecorationImage(
-                    fit: BoxFit.contain,
+                    fit: BoxFit.fill,
                     image: AssetImage(
                       ImageAssets.bottom,
                     ))),
             child: Container(
                 decoration: BoxDecoration(
-                  color: ColorManager.white.withOpacity(0.2),
+                  color: ColorManager.white.withOpacity(0.3),
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0)),
@@ -275,13 +437,16 @@ class _MainScreenState extends State<MainScreen> {
                       width: getProportionateScreenWidth(250),
                       decoration: BoxDecoration(
                         border:
-                            Border.all(color: ColorManager.primary, width: 5),
+                            Border.all(color: ColorManager.primary, width: 10),
                         shape: BoxShape.circle,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: CircleAvatar(
-                          foregroundImage: Image.file(imageFile!).image,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: CircleAvatar(
+                            foregroundImage: Image.file(imageFile!).image,
+                          ),
                         ),
                       ),
                     ),
@@ -289,23 +454,30 @@ class _MainScreenState extends State<MainScreen> {
                       height: getProportionateScreenHeight(10),
                     ),
                     Card(
-                      shadowColor: ColorManager.primary,
+                      color: ColorManager.primary,
+                      shadowColor: ColorManager.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
                       elevation: 20,
                       child: ListTile(
                         dense: true,
-                        focusColor: ColorManager.primary,
+                        focusColor: ColorManager.white,
                         leading: Text(
-                          "DOG BREED",
+                          "DOG BREED:",
                           style: TextStyle(
-                              color: ColorManager.primary,
+                              color: ColorManager.white,
+                              fontSize: FontSize.s18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        title: Text(
+                          result,
+                          style: TextStyle(
+                              color: ColorManager.white,
                               fontSize: FontSize.s18),
                         ),
-                        title: const Text("TEXT"),
                       ),
-                    )
+                    ),
                   ],
                 )),
           );
