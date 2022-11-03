@@ -35,6 +35,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final deviceRatio = size.width / size.height;
     SizeConfig().init(context);
     return Scaffold(
       body: Center(
@@ -42,15 +44,17 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-                height: getProportionateScreenHeight(300),
-                width: getProportionateScreenWidth(230),
-                child: SvgPicture.asset(ImageAssets.logo, fit: BoxFit.fill)),
+            SvgPicture.asset(
+              ImageAssets.logo,
+              fit: BoxFit.fill,
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: MediaQuery.of(context).size.width * 0.4,
+            ),
             Text(
               AppStrings.splashtext,
               style: TextStyle(
                   color: ColorManager.primary,
-                  fontSize: FontSize.s20,
+                  fontSize: MediaQuery.of(context).size.height * 0.03,
                   fontWeight: FontWeightManager.bold),
             )
           ],
