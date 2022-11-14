@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
   _gonext() {
     Navigator.pushReplacementNamed(
       context,
-      Routes.main,
+      Routes.home,
     );
   }
 

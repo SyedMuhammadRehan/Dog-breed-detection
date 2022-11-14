@@ -1,3 +1,24 @@
+import 'package:dog_breed_detection/resources/stylesmanager.dart';
+import 'package:dog_breed_detection/resources/valuemanager.dart';
+import 'package:flutter/material.dart';
+
+import 'colormanager.dart';
+import 'fontsmanager.dart';
+
+ThemeData getApplicationTheme() {
+  return ThemeData(
+    primaryColor: ColorManager.primary,
+    appBarTheme: AppBarTheme(
+        centerTitle: true,
+        elevation: AppSize.s4,
+        color: ColorManager.primary,
+        titleTextStyle: regularTextStyle(
+            color: ColorManager.white, fontSize: FontSize.s16)),
+  );
+}
+
+
+
 
 // import 'package:flutter/material.dart';
 
