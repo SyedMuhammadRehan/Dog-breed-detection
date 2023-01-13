@@ -164,6 +164,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                   InkWell(
                                     onTap: (() async {
                                       if (controller != null) {
+                                      
                                         if (controller!.value.isInitialized) {
                                           ref
                                               .watch(notifierProvider)

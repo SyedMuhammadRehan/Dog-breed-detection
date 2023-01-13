@@ -82,14 +82,17 @@ class ImageNotifier extends ChangeNotifier {
       asynch: true,
     );
     result = '';
-
-    print("detected output is ${output![0]['label']}");
-
-    result = output[0]['label'];
-    print("RESULT $result");
-    await showbottomsheet(context);
-    notifyListeners();
-    return output;
+    if (output.isEmpty) {
+      result = 'No breed found';
+      showbottomsheet(context);
+      // Show a message that the image could not be classified
+      return null;
+    } else {
+      result = output[0]['label'];
+      await showbottomsheet(context);
+      notifyListeners();
+      return output;
+    }
   }
 
   Future showbottomsheet(context) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorManager {
+  static const clr = 'l';
   static Color primary = HexColor.fromHex('#ea725a');
   static Color white = HexColor.fromHex('#FFFFFF');
   static Color error = HexColor.fromHex('#e61f34');

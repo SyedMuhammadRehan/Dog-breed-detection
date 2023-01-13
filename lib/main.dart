@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:dog_breed_detection/resources/routesmanager.dart';
-import 'package:dog_breed_detection/resources/theme_manager.dart';
+import 'package:dog_breed_detection/resources/stringmanager.dart';
 import 'package:dog_breed_detection/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,13 +18,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateRoute: RoutGenerator.getRoute,
       initialRoute: Routes.splashscreen,
-      theme: getApplicationTheme(),
-      title: 'Flutter Demo',
-      home: const SplashScreen(),
+      title: AppStrings.splashtext,
+      home: SplashScreen(),
     );
   }
 }
